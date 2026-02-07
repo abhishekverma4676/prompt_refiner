@@ -4,8 +4,6 @@ services:
   backend:
     build: ./Backend
     container_name: fastapi-backend
-    env_file:
-      - ./Backend/.env
     ports:
       - "8000:8000"
     restart: always
