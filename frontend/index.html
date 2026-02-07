@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Refiner — AI-Powered Prompt Engineering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e14;
+            --bg-secondary: #12171f;
+            --bg-card: #1a1f2b;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0;
+            --text-muted: #6b7280;
+            --border: #2a3040;
+            --success: #4ade80;
+            --error: #ef4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .background-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.03;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 35px, var(--accent-primary) 35px, var(--accent-primary) 36px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, var(--accent-secondary) 35px, var(--accent-secondary) 36px);
+            animation: patternShift 60s linear infinite;
+        }
+
+        @keyframes patternShift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(100px, 100px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Main Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 32px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr 1.5fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(255, 107, 53, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 2px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 500;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+        }
+
+        textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Crimson Pro', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Loading State */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 12px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results */
+        .results {
+            display: none;
+        }
+
+        .results.active {
+            display: block;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .prompt-section {
+            margin-bottom: 32px;
+            padding: 24px;
+            background: var(--bg-secondary);
+            border-left: 4px solid var(--accent-primary);
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .prompt-section:nth-child(2) {
+            border-left-color: var(--accent-secondary);
+        }
+
+        .prompt-section:nth-child(3) {
+            border-left-color: var(--success);
+        }
+
+        .prompt-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 16px;
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        .prompt-section:nth-child(2) h3 {
+            color: var(--accent-secondary);
+        }
+
+        .prompt-section:nth-child(3) h3 {
+            color: var(--success);
+        }
+
+        .prompt-content {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            padding: 8px 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .copy-btn.copied {
+            background: var(--success);
+            color: white;
+            border-color: var(--success);
+        }
+
+        /* Error Message */
+        .error-message {
+            display: none;
+            padding: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error);
+            border-radius: 8px;
+            color: var(--error);
+            margin-bottom: 20px;
+            animation: shake 0.5s ease;
+        }
+
+        .error-message.active {
+            display: block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Features Grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 32px;
+        }
+
+        .feature-item {
+            padding: 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .feature-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px 16px;
+            }
+
+            .card {
+                padding: 24px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .copy-btn {
+                position: static;
+                margin-top: 12px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    
+    <div class="container">
+        <header>
+            <h1>Prompt Refiner</h1>
+            <p class="subtitle">Transform your ideas into production-ready prompts with AI-powered engineering</p>
+        </header>
+
+        <div class="main-grid">
+            <!-- Input Section -->
+            <div class="card">
+                <h2 class="card-title">Input Query</h2>
+                
+                <form id="refinerForm">
+                    <div class="form-group">
+                        <label for="queryInput">Enter your prompt or question</label>
+                        <textarea 
+                            id="queryInput" 
+                            name="query" 
+                            placeholder="e.g., explain quantum computing to beginner..."
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="error-message" id="errorMessage"></div>
+
+                    <button type="submit" class="btn" id="submitBtn">
+                        <span id="btnText">Refine Prompt</span>
+                    </button>
+                </form>
+
+                <div class="features">
+                    <div class="feature-item">
+                        <div class="feature-icon">📝</div>
+                        <div class="feature-title">Grammar Fix</div>
+                        <div class="feature-desc">Auto-correct</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">✨</div>
+                        <div class="feature-title">3 Variants</div>
+                        <div class="feature-desc">Different styles</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-icon">🚀</div>
+                        <div class="feature-title">Production Ready</div>
+                        <div class="feature-desc">Optimized output</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <h2 class="card-title">Refined Prompts</h2>
+
+                <div class="loading" id="loadingState">
+                    <div class="spinner"></div>
+                    <p>Refining your prompt...</p>
+                </div>
+
+                <div class="results" id="resultsContainer">
+                    <div id="promptsOutput"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000'; // Change this to your backend URL
+
+        const form = document.getElementById('refinerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const loadingState = document.getElementById('loadingState');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const promptsOutput = document.getElementById('promptsOutput');
+        const errorMessage = document.getElementById('errorMessage');
+        const queryInput = document.getElementById('queryInput');
+
+        form.addEventListener('submit', async (e) => {e.preventDefault();
+            
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            errorMessage.classList.remove('active');
+            resultsContainer.classList.remove('active');
+            loadingState.classList.add('active');
+            submitBtn.disabled = true;
+            btnText.textContent = 'Processing...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/refiner`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+                loadingState.classList.remove('active');
+                resultsContainer.classList.add('active');
+                promptsOutput.innerHTML = '<div class="prompt-section"><div class="prompt-content" id="streamContent"></div></div>';
+                
+                const contentDiv = document.getElementById('streamContent');
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let fullText = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    fullText += chunk;
+                    contentDiv.textContent = fullText;
+                }
+
+                // Final parsing
+                displayResults(fullText);
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.classList.add('active');
+                loadingState.classList.remove('active');
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = 'Refine Prompt';
+            }
+        });
+
+        function displayResults(promptText) {
+            // Parse the response to extract different prompt types
+            const sections = parsePromptSections(promptText);
+            
+            let html = '';
+            sections.forEach((section, index) => {
+                html += `
+                    <div class="prompt-section">
+                        <h3>${section.title}</h3>
+                        <button class="copy-btn" onclick="copyToClipboard(this, ${index})">Copy</button>
+                        <div class="prompt-content">${section.content}</div>
+                    </div>
+                `;
+            });
+
+            promptsOutput.innerHTML = html;
+            resultsContainer.classList.add('active');
+        }
+
+        function parsePromptSections(text) {
+            const sections = [];
+            
+            // Clean the text
+            text = text.trim();
+            
+            // Try multiple parsing patterns
+            
+            // Pattern 1: **Title:** format
+            const detailedMatch1 = text.match(/\*\*Detailed Prompt:?\*\*\s*([\s\S]*?)(?=\*\*Concise Prompt:?|---|\*\*Conc|$)/i);
+            const conciseMatch1 = text.match(/\*\*Concise Prompt:?\*\*\s*([\s\S]*?)(?=\*\*Instructional Prompt:?|---|\*\*Inst|$)/i);
+            const instructionalMatch1 = text.match(/\*\*Instructional Prompt:?\*\*\s*([\s\S]*?)$/i);
+            
+            // Pattern 2: Simple Title: format
+            const detailedMatch2 = text.match(/Detailed Prompt:?\s*\n([\s\S]*?)(?=Concise Prompt:|---|\n\n\n|$)/i);
+            const conciseMatch2 = text.match(/Concise Prompt:?\s*\n([\s\S]*?)(?=Instructional Prompt:|---|\n\n\n|$)/i);
+            const instructionalMatch2 = text.match(/Instructional Prompt:?\s*\n([\s\S]*?)$/i);
+            
+            // Use whichever pattern matched
+            const detailedContent = (detailedMatch1 && detailedMatch1[1]) || (detailedMatch2 && detailedMatch2[1]);
+            const conciseContent = (conciseMatch1 && conciseMatch1[1]) || (conciseMatch2 && conciseMatch2[1]);
+            const instructionalContent = (instructionalMatch1 && instructionalMatch1[1]) || (instructionalMatch2 && instructionalMatch2[1]);
+            
+            if (detailedContent) {
+                sections.push({
+                    title: '📋 Detailed Prompt',
+                    content: detailedContent.trim().replace(/^---+\s*/g, '')
+                });
+            }
+            
+            if (conciseContent) {
+                sections.push({
+                    title: '⚡ Concise Prompt',
+                    content: conciseContent.trim().replace(/^---+\s*/g, '')
+                });
+            }
+            
+            if (instructionalContent) {
+                sections.push({
+                    title: '📝 Instructional Prompt',
+                    content: instructionalContent.trim().replace(/^---+\s*/g, '')
+                });
+            }
+            
+            // Fallback: split by common separators
+            if (sections.length === 0) {
+                const parts = text.split(/---+|\*\*\*+/);
+                parts.forEach((part, index) => {
+                    const trimmed = part.trim();
+                    if (trimmed.length > 50) {
+                        sections.push({
+                            title: `Prompt ${index + 1}`,
+                            content: trimmed
+                        });
+                    }
+                });
+            }
+            
+            // Last fallback: return entire text
+            if (sections.length === 0) {
+                sections.push({
+                    title: 'Refined Prompt',
+                    content: text
+                });
+            }
+            
+            return sections;
+        }
+
+        function copyToClipboard(button, index) {
+            const promptSection = button.closest('.prompt-section');
+            const content = promptSection.querySelector('.prompt-content').textContent;
+
+            navigator.clipboard.writeText(content).then(() => {
+                const originalText = button.textContent;
+                button.textContent = 'Copied!';
+                button.classList.add('copied');
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Auto-resize textarea
+        queryInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.max(200, this.scrollHeight) + 'px';
+        });
+    </script>
+</body>
+</html>
